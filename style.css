@@ -1,32 +1,4 @@
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-  width: 100%;
-}
-
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-}
-
-.canv-cont {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 66.67vw;
-  height: 90vh;
-}
-
-#tetris-canvas {
-  width: 70%;
-  height: 100%;
-  outline: 10px solid #816CB3;
+    margin: 0;
+    padding: 0;
 }
