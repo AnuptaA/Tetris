@@ -8,9 +8,52 @@
   </head>
   <body>
     <main>
-        <div class="canv-cont">
-            <canvas id="tetris-canvas", height="800" width="800"> </canvas>
+      <div class="title-cont">
+        <h1 class="title">Tetris</h1>
+      </div>
+      <div class="canvas-cont">
+        <div class="stats-cont">
+          <div class="blocks-cont">
+            <h2 class="stats-title">Statistics</h2>
+            <ul>
+              <li><span class="o-cnt">000</span></li>
+              <li><span class="i-cnt">000</span></li>
+              <li><span class="s-cnt">000</span></li>
+              <li><span class="z-cnt">000</span></li>
+              <li><span class="l-cnt">000</span></li>
+              <li><span class="j-cnt">000</span></li>
+              <li><span class="t-cnt">000</span></li>
+            </ul>
+          </div>
+          <canvas id="stats-canvas" height="800" width="300"></canvas>
         </div>
+        <div class="tetris-cont">
+          <canvas id="tetris-canvas" height="800" width="400"></canvas>
+        </div>
+        <div class="misc-cont">
+          <div class="text-elements-cont">
+            <div class="score-cont">
+              <div class="curr-score-cont">
+                <h2>Score</h2>
+                <span class="curr-score">0</span>
+              </div>
+              <div class="high-score-cont">
+                <h2>High Score</h2>
+                <span class="high-score">0</span>
+              </div>
+            </div>
+            <div class="level-cont">
+              <h2>Level: <span class="level">1</span></h2>
+            </div>
+            <div class="next-block-cont">
+              <h2>Next Block</h2>
+            </div>
+          </div>
+          <div class="misc-canvas-cont">
+            <canvas id="misc-canvas" height="800" width="300"></canvas>
+          </div>
+        </div>
+      </div>
     </main>
     <script src="index.js"></script>
   </body>

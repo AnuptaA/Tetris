@@ -1,4 +1,112 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Press Start 2P";
+  color: #cbc3e3;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+canvas {
+  display: block;
+  outline: 10px solid #cbc3e3;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.title-cont {
+  padding: 1% 0;
+}
+
+.canvas-cont {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 50px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.stats-cont,
+.misc-cont {
+  position: relative;
+}
+
+.blocks-cont {
+  position: absolute;
+  padding: 5% 0;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+}
+
+.blocks-cont ul {
+  list-style: none;
+}
+
+.blocks-cont li {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10%;
+}
+
+.stats-title {
+  text-align: center;
+}
+
+.text-elements-cont {
+  padding-top: 25%;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.score-cont,
+.level-cont,
+.next-block-cont {
+  padding-bottom: 40%;
+}
+
+.curr-score-cont, .high-score-cont {
+    padding: 5% 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.curr-score-cont h2, .high-score-cont h2 {
+    padding-bottom: 10px;
+}
+
+.curr-score, .high-score {
+    font-size: 20px;
+}
+
+@media (max-width: 1200px) {
+  .canvas-cont {
+    flex-direction: column;
+    gap: 30px;
+  }
 }
