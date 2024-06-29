@@ -35,7 +35,7 @@ main {
 }
 
 .title-cont {
-  padding: 1% 0;
+  padding: 2% 0;
 }
 
 .canvas-cont {
@@ -68,6 +68,7 @@ main {
   display: flex;
   justify-content: flex-end;
   padding: 10%;
+  padding-top: 18%;
 }
 
 .stats-title {
@@ -102,6 +103,23 @@ main {
 
 .curr-score, .high-score {
     font-size: 20px;
+}
+
+.btn {
+    padding-top: 10%;
+    color: "#1F0954";
+}
+
+.pause-play-btn, .reset-btn {
+    padding: 2.5%;
+    border-radius: 10px;
+    background-color: #E6E6FA;
+    color: "#1F0954";
+    cursor: pointer;
+}
+
+.general-text, .reset {
+    color: "#1F0954";
 }
 
 @media (max-width: 1200px) {
