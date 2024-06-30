@@ -10,9 +10,6 @@ const t_draw = {
         this.drawBlock(j * dim, i * dim, grid_color, ctx, dim);
       }
     }
-
-
-
   },
   drawStatsCanvas(ctx, canvas, w, h, dim, colors) {
     ctx.fillStyle = t_draw.color;
@@ -118,13 +115,14 @@ const t_draw = {
     this.drawBlock(x + 2 * dim, y, colors[6], ctx, dim);
     this.drawBlock(x + dim, y + dim, colors[6], ctx, dim);
   },
-  drawCurrBlock(ctx, grid, dim, colors, piece) {
-    const color = colors[grid[piece.A.x][piece.A.y]];
-    if (color == -1) return;
-    piece.forEach(block => {
-        this.drawBlock(block.y, block.x, color, ctx, dim);
-    })
-  }
+  //   drawCurrBlock(ctx, grid, dim, colors, piece) {
+  //     if (piece.length == 0) return;
+  //     const color = colors[grid[piece.A.x][piece.A.y]];
+  //     if (color == -1) return;
+  //     for (let i = 0; i < piece.length; i++) {
+  //       // this.drawBlock(piece[i].x, piece[i].x, color, ctx, dim);
+  //     }
+  //   },
 };
 
 export default t_draw;

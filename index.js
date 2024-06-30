@@ -21,7 +21,11 @@ const counts = document.getElementsByClassName("cnt");
 const curr_level = document.getElementsByClassName("level")[0];
 
 const NUM_BLOCKS = 10;
+const NUM_ROWS = 2 * NUM_BLOCKS;
 const INDIGO = "#1F0954";
+
+const start_btn = document.getElementsByClassName("pause-play-btn")[0];
+const reset_btn = document.getElementsByClassName("reset-btn")[0];
 
 // JavaScript (O, I, S, Z, L, J, T)
 const colors = [
@@ -36,41 +40,46 @@ const colors = [
 
 var curr_score;
 var dim;
-var curr_block;
+var piece;
 var curr_color;
 var next_color;
 var first_gen;
 var grid;
+var timeout;
+var gameOver;
+var gameStarted;
 
 function init() {
-  curr_score = 0;
+  gameOver = false;
   first_gen = false;
   dim = w / NUM_BLOCKS;
-  grid = [];
-  curr_block = {
-    A: { x: -1, y: -1 },
-    B: { x: -1, y: -1 },
-    C: { x: -1, y: -1 },
-    D: { x: -1, y: -1 },
-  };
-
-  for (let i = 0; i < 2 * NUM_BLOCKS; i++) {
-    const row = [];
-    for (let j = 0; j < NUM_BLOCKS; j++) row.push(-1);
-    grid.push(row);
-  }
-
+  piece = [
+    { x: -1, y: -1 },
+    { x: -1, y: -1 },
+    { x: -1, y: -1 },
+    { x: -1, y: -1 },
+  ];
+  clearGrid();
   generateBlocks();
   t_draw.drawStatsCanvas(stats_ctx, stats_canvas, w, h, dim, colors);
   t_draw.drawMiscCanvas(misc_ctx, misc_canvas, w, h, dim, colors, next_color);
   t_draw.drawTetrisCanvas(tetris_ctx, w, h, grid, dim, colors);
-  t_draw.drawCurrBlock(tetris_ctx, grid, dim, colors, curr_block);
+}
+
+function clearGrid() {
+  grid = [];
+  for (let i = 0; i < NUM_ROWS; i++) {
+    const row = [];
+    for (let j = 0; j < NUM_BLOCKS; j++) row.push(-1);
+    grid.push(row);
+  }
 }
 
 function generateBlocks() {
   if (!first_gen) {
     first_gen = true;
     next_color = Math.floor(Math.random() * colors.length);
+    t_draw.drawNextBlock(misc_ctx, misc_canvas, dim, next_color, colors);
     return;
   }
   curr_color = next_color;
@@ -79,54 +88,118 @@ function generateBlocks() {
   switch (curr_color) {
     // handle edge cases (end game) later
     case 0:
-      Object.assign(curr_block.A, { x: 4, y: 0 });
-      Object.assign(curr_block.B, { x: 5, y: 0 });
-      Object.assign(curr_block.C, { x: 4, y: 1 });
-      Object.assign(curr_block.D, { x: 5, y: 1 });
+      assignCoord(4, 0, 5, 0, 4, 1, 5, 1);
       break;
     case 1:
-      Object.assign(curr_block.A, { x: 3, y: 0 });
-      Object.assign(curr_block.B, { x: 4, y: 0 });
-      Object.assign(curr_block.C, { x: 5, y: 0 });
-      Object.assign(curr_block.D, { x: 6, y: 0 });
+      assignCoord(3, 0, 4, 0, 5, 0, 6, 0);
       break;
     case 2:
-      Object.assign(curr_block.A, { x: 4, y: 0 });
-      Object.assign(curr_block.B, { x: 5, y: 0 });
-      Object.assign(curr_block.C, { x: 3, y: 1 });
-      Object.assign(curr_block.D, { x: 4, y: 1 });
+      assignCoord(4, 0, 5, 0, 3, 1, 4, 1);
       break;
     case 3:
-      Object.assign(curr_block.A, { x: 3, y: 0 });
-      Object.assign(curr_block.B, { x: 4, y: 0 });
-      Object.assign(curr_block.C, { x: 4, y: 1 });
-      Object.assign(curr_block.D, { x: 5, y: 1 });
+      assignCoord(3, 0, 4, 0, 4, 1, 5, 1);
       break;
     case 4:
-      Object.assign(curr_block.A, { x: 5, y: 0 });
-      Object.assign(curr_block.B, { x: 3, y: 1 });
-      Object.assign(curr_block.C, { x: 4, y: 1 });
-      Object.assign(curr_block.D, { x: 5, y: 1 });
+      assignCoord(5, 0, 3, 1, 4, 1, 5, 1);
       break;
     case 5:
-      Object.assign(curr_block.A, { x: 3, y: 0 });
-      Object.assign(curr_block.B, { x: 3, y: 1 });
-      Object.assign(curr_block.C, { x: 4, y: 1 });
-      Object.assign(curr_block.D, { x: 5, y: 1 });
+      assignCoord(3, 0, 3, 1, 4, 1, 5, 1);
       break;
     case 6:
-      Object.assign(curr_block.A, { x: 4, y: 1 });
-      Object.assign(curr_block.B, { x: 3, y: 0 });
-      Object.assign(curr_block.C, { x: 4, y: 0 });
-      Object.assign(curr_block.D, { x: 5, y: 0 });
+      assignCoord(4, 1, 3, 0, 4, 0, 5, 0);
       break;
   }
-
-  grid[curr_block.A.x][curr_block.A.y] = curr_color;
-  grid[curr_block.B.x][curr_block.B.y] = curr_color;
-  grid[curr_block.C.x][curr_block.C.y] = curr_color;
-  grid[curr_block.D.x][curr_block.D.y] = curr_color;
-
+  if (piece.some((p) => grid[p.y][p.x] != -1)) {
+    clearTimeout(timeout);
+    gameOver = true;
+    handleGameOver();
+    return;
+  }
+  assignColor(curr_color);
+  counts[curr_color].textContent = parseInt(counts[curr_color].textContent) + 1;
+  t_draw.drawNextBlock(misc_ctx, misc_canvas, dim, next_color, colors);
 }
 
-init();
+function assignCoord(x1, y1, x2, y2, x3, y3, x4, y4) {
+  let args = [x1, x2, x3, x4, y1, y2, y3, y4];
+  for (let i = 0; i < piece.length; i++) {
+    piece[i].x = args[i];
+    piece[i].y = args[i + 4];
+  }
+}
+
+function assignColor(colorIdx) {
+  piece.forEach((p) => (grid[p.y][p.x] = colorIdx));
+}
+
+function checkFloor() {
+  return piece.some((p) => p.y >= NUM_ROWS - 1);
+}
+
+function checkVerticalCollision() {
+  let c,
+    idx = -10;
+  piece.forEach((p) => (grid[p.y][p.x] = idx));
+  c = piece.some((p) => grid[p.y + 1][p.x] != -1 && grid[p.y + 1][p.x] != idx);
+  piece.forEach((p) => (grid[p.y][p.x] = curr_color));
+  return c;
+}
+
+function moveBlock() {
+  if (checkFloor() || checkVerticalCollision()) {
+    assignColor(curr_color);
+    generateBlocks();
+    return;
+  }
+  assignColor(-1);
+  piece.forEach((p) => (p.y += 1));
+  assignColor(curr_color);
+}
+
+function handleGameOver() {
+  tetris_ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  tetris_ctx.fillRect(0, 0, w, h);
+  tetris_ctx.fillStyle = "white";
+  tetris_ctx.font = "30px Arial";
+  tetris_ctx.fillText("Game Over!", w / 2 - 70, h / 2);
+
+  if (curr_score > parseInt(high_span.textContent)) {
+    high_span.textContent = curr_score;
+  }
+}
+
+function refresh() {
+  if (gameOver) return;
+  t_draw.drawTetrisCanvas(tetris_ctx, w, h, grid, dim, colors);
+  moveBlock();
+  timeout = setTimeout(refresh, 750);
+}
+
+function startGame() {
+  gameOver = false;
+  curr_score = 0;
+  generateBlocks();
+  if (timeout) clearTimeout(timeout);
+  timeout = setTimeout(refresh, 750);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    gameStarted = false;
+    init();
+});
+
+start_btn.addEventListener("click", () => {
+  if (!gameStarted) {
+    gameStarted = true;
+    startGame();
+  }
+});
+
+reset_btn.addEventListener("click", () => {
+  if (!gameStarted) gameStarted = true;
+  gameOver = false;
+  init();
+  for (let count of counts) count.textContent = "000";
+  clearTimeout(timeout);
+  startGame();
+});
