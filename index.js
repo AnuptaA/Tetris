@@ -27,7 +27,6 @@ const INDIGO = "#1F0954";
 const start_btn = document.getElementsByClassName("pause-play-btn")[0];
 const reset_btn = document.getElementsByClassName("reset-btn")[0];
 
-// JavaScript (O, I, S, Z, L, J, T)
 const colors = [
   "#FFEA00", // O
   "#53e3d4", // I
@@ -37,6 +36,10 @@ const colors = [
   "#0000FF", // J
   "#DA70D6", // T
 ];
+
+// DOWN, LEFT, RIGHT
+const MOVE_KEYS = [40, 83, 37, 65, 39, 68];
+// const ROT
 
 var curr_score;
 var dim;
@@ -86,7 +89,6 @@ function generateBlocks() {
   next_color = Math.floor(Math.random() * colors.length);
 
   switch (curr_color) {
-    // handle edge cases (end game) later
     case 0:
       assignCoord(4, 0, 5, 0, 4, 1, 5, 1);
       break;
@@ -122,10 +124,8 @@ function generateBlocks() {
 
 function assignCoord(x1, y1, x2, y2, x3, y3, x4, y4) {
   let args = [x1, x2, x3, x4, y1, y2, y3, y4];
-  for (let i = 0; i < piece.length; i++) {
-    piece[i].x = args[i];
-    piece[i].y = args[i + 4];
-  }
+  for (let i = 0; i < piece.length; i++)
+    piece[i] = { x: args[i], y: args[i + 4] };
 }
 
 function assignColor(colorIdx) {
@@ -137,15 +137,39 @@ function checkFloor() {
 }
 
 function checkVerticalCollision() {
-  let c,
-    idx = -10;
+  let c;
+  let idx = -10;
   piece.forEach((p) => (grid[p.y][p.x] = idx));
   c = piece.some((p) => grid[p.y + 1][p.x] != -1 && grid[p.y + 1][p.x] != idx);
   piece.forEach((p) => (grid[p.y][p.x] = curr_color));
   return c;
 }
 
-function moveBlock() {
+// Left = -1, Right = 1;
+function checkHorizontalCollision(dir) {
+  let c;
+  let idx = -10;
+  piece.forEach((p) => (grid[p.y][p.x] = idx));
+  c = piece.some(
+    (p) => grid[p.y][p.x + dir] != -1 && grid[p.y][p.x + dir] != idx
+  );
+  piece.forEach((p) => (grid[p.y][p.x] = curr_color));
+}
+
+function checkWall(dir) {
+  return piece.some((p) => p.x + dir < 0 || p.x + dir > NUM_BLOCKS - 1);
+}
+
+function move(event) {
+  const key = event.keyCode;
+  if (key == MOVE_KEYS[0] || key == MOVE_KEYS[1]) moveDown();
+  if (key == MOVE_KEYS[2] || key == MOVE_KEYS[3]) moveHorizontal(-1);
+  if (key == MOVE_KEYS[4] || key == MOVE_KEYS[5]) moveHorizontal(1);
+  t_draw.drawTetrisCanvas(tetris_ctx, w, h, grid, dim, colors);
+  if (MOVE_KEYS.includes(key)) event.preventDefault();
+}
+
+function moveDown() {
   if (checkFloor() || checkVerticalCollision()) {
     assignColor(curr_color);
     generateBlocks();
@@ -153,6 +177,18 @@ function moveBlock() {
   }
   assignColor(-1);
   piece.forEach((p) => (p.y += 1));
+  assignColor(curr_color);
+}
+
+function moveHorizontal(dir) {
+  if (checkHorizontalCollision || checkHorizontalCollision(dir)) {
+    assignColor(curr_color);
+    generateBlocks();
+    return;
+  }
+  if (checkWall(dir)) return;
+  assignColor(-1);
+  piece.forEach((p) => (p.x = p.x + dir));
   assignColor(curr_color);
 }
 
@@ -171,7 +207,7 @@ function handleGameOver() {
 function refresh() {
   if (gameOver) return;
   t_draw.drawTetrisCanvas(tetris_ctx, w, h, grid, dim, colors);
-  moveBlock();
+  moveDown();
   timeout = setTimeout(refresh, 750);
 }
 
@@ -183,10 +219,13 @@ function startGame() {
   timeout = setTimeout(refresh, 750);
 }
 
+// Add functions to elements
 document.addEventListener("DOMContentLoaded", () => {
-    gameStarted = false;
-    init();
+  gameStarted = false;
+  init();
 });
+
+document.addEventListener("keydown", move);
 
 start_btn.addEventListener("click", () => {
   if (!gameStarted) {
